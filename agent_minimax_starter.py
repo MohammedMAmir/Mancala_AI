@@ -7,17 +7,17 @@
 from mancala_game import Board, play_move
 from utils import *
 
-def is_terminal(state):
+def is_terminal(board):
     top_empty = True
     bott_empty = True
-    for pocket in state.pockets[TOP]:
+    for pocket in board.pockets[TOP]:
         if pocket != 0:
             top_empty = False
 
     if top_empty == True:
         return True
     
-    for pocket in state.pockets[BOTTOM]:
+    for pocket in board.pockets[BOTTOM]:
         if pocket != 0:
             bott_empty = False
     if bott_empty == True:
@@ -25,8 +25,17 @@ def is_terminal(state):
     
     return False
 
-def max_val(state, player, heuristic_function):
-    
+##FINISH THIS##
+def resulting_boards(board, player):
+    boards = []
+    return boards
+
+def max_val(board, player, heuristic_function):
+    if is_terminal(board) == True:
+        return None, heuristic_function(board, player)
+
+    best_move = None
+    best_value = float('-inf')
 
 def minimax_max_basic(board, curr_player, heuristic_func):
     """
