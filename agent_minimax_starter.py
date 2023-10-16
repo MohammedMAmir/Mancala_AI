@@ -25,9 +25,53 @@ def is_terminal(board):
     
     return False
 
-##FINISH THIS##
+def play_index(board, index, player):
+    top_pockets = []
+    bottom_pockets = []
+    for i in range(board.dimension):
+        top_pockets[i] = board[TOP][i]
+        bottom_pockets[i] = board[BOTTOM][i]
+    pockets = []
+    pockets[TOP] = top_pockets
+    pockets[BOTTOM] = bottom_pockets
+    
+    mancalas = []
+    mancalas[TOP] = board. mancalas[TOP]
+    mancalas[BOTTOM] = board.mancalas[BOTTOM]
+
+    new_board = Board(pockets, mancalas)
+
+    stones_in_hand = new_board.pockets[player][index]
+    new_board.pockets[player][index] = 0
+    index += 1
+    curr_top_or_bottom = player
+    while(stones_in_hand > 0):
+        if(index >= board.dimension):
+            new_board.mancalas[curr_top_or_bottom] += 1
+            stones_in_hand -= 1
+            index = 0
+            if curr_top_or_bottom == TOP:
+                curr_top_or_bottom = BOTTOM
+            else:
+                curr_top_or_bottom = TOP
+        else:
+            if(stones_in_hand == 1 and curr_top_or_bottom == player):
+                if player == TOP:
+                 captured_stones = new_board.pockets[BOTTOM][board.dimension - 1 - index]
+                 new_board.pockets[BOTTOM][board.dimension - 1 - index] = 0
+                 new_board.pockets[index] += captured_stones
+            new_board.pockets[curr_top_or_bottom][index] += 1
+            stones_in_hand -= 1
+            index += 1
+
+    return new_board
+
 def resulting_boards(board, player):
     boards = []
+    resulting_indices = board.get_possible_moves()
+    for index in resulting_indices:
+        boards.append(play_index(board, index, player))
+
     return boards
 
 def max_val(board, player, heuristic_function):
@@ -36,6 +80,18 @@ def max_val(board, player, heuristic_function):
 
     best_move = None
     best_value = float('-inf')
+
+    for move in resulting_boards(board, player):
+        if player == TOP:
+            _, value = min_val(move, BOTTOM)
+        if player == BOTTOM:
+            _, value = min_val(move, TOP)
+        if value > best_value:
+            best_move = move
+            best_value = value
+        
+    return best_move, best_value
+
 
 def minimax_max_basic(board, curr_player, heuristic_func):
     """
