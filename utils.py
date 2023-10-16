@@ -44,6 +44,10 @@ def heuristic_basic(board, player):
     :param player: the current player.
     :return: an estimated utility of the current board for the current player.
     """
+    if player == TOP:
+        return(board.mancalas[TOP] - board.mancalas[BOTTOM])
+    else:
+        return(board.mancalas[BOTTOM] - board.mancalas[TOP])
 
     raise NotImplementedError
 

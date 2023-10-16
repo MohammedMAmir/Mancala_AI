@@ -7,6 +7,26 @@
 from mancala_game import Board, play_move
 from utils import *
 
+def is_terminal(state):
+    top_empty = True
+    bott_empty = True
+    for pocket in state.pockets[TOP]:
+        if pocket != 0:
+            top_empty = False
+
+    if top_empty == True:
+        return True
+    
+    for pocket in state.pockets[BOTTOM]:
+        if pocket != 0:
+            bott_empty = False
+    if bott_empty == True:
+        return True
+    
+    return False
+
+def max_val(state, player, heuristic_function):
+    
 
 def minimax_max_basic(board, curr_player, heuristic_func):
     """
@@ -19,6 +39,8 @@ def minimax_max_basic(board, curr_player, heuristic_func):
     :param heuristic_func: the heuristic function
     :return the best move and its minimax value according to minimax search.
     """
+
+
 
     raise NotImplementedError
 
