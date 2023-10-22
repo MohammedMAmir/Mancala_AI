@@ -7,6 +7,23 @@
 from mancala_game import Board, play_move
 from utils import *
 
+def is_terminal(board):
+    top_empty = True
+    bott_empty = True
+    for pocket in board.pockets[TOP]:
+        if pocket != 0:
+            top_empty = False
+
+    if top_empty == True:
+        return True
+    
+    for pocket in board.pockets[BOTTOM]:
+        if pocket != 0:
+            bott_empty = False
+    if bott_empty == True:
+        return True
+    
+    return False
 
 def alphabeta_max_basic(board, curr_player, alpha, beta, heuristic_func):
     """
@@ -21,6 +38,28 @@ def alphabeta_max_basic(board, curr_player, alpha, beta, heuristic_func):
     :param heuristic_func: the heuristic function
     :return the best move and its minimax value.
     """
+    if is_terminal(board) == True:
+        return None, heuristic_func(board, curr_player)
+
+    best_move = None
+    best_value = float('-inf')
+
+    for index in board.get_possible_moves(curr_player):
+        new_board = play_move(board, curr_player, index)
+        if curr_player == TOP:
+            _, value = alphabeta_min_basic(new_board, BOTTOM, alpha, beta, heuristic_func)
+        if curr_player == BOTTOM:
+            _, value = alphabeta_min_basic(new_board, TOP, alpha, beta, heuristic_func)
+        if value > best_value:
+            best_move = index
+            best_value = value
+            if best_value > alpha:
+                alpha = best_value
+                if alpha >= beta:
+                    return best_move, best_value
+        
+    ##play_index(board, best_move, curr_player).draw_board()
+    return best_move, best_value
 
     raise NotImplementedError
 
@@ -37,7 +76,31 @@ def alphabeta_min_basic(board, curr_player, alpha, beta, heuristic_func):
     :param heuristic_func: the heuristic function
     :return the best move and its minimax value.
     """
+    if is_terminal(board) == True:
+        if curr_player == TOP:
+                return None, heuristic_func(board, BOTTOM)
+        if curr_player == BOTTOM:
+                return None, heuristic_func(board, TOP)
+            
+            
+    best_move = None
+    best_value = float('inf')
 
+    for index in board.get_possible_moves(curr_player):
+        new_board = play_move(board, curr_player, index)
+        if curr_player == TOP:
+            _, value = alphabeta_max_basic(new_board, BOTTOM, alpha, beta, heuristic_func)
+        if curr_player == BOTTOM:
+            _, value = alphabeta_max_basic(new_board, TOP, alpha, beta, heuristic_func)
+        if value < best_value:
+            best_move = index
+            best_value = value
+            if best_value < beta:
+                beta = best_value
+                if alpha >= beta:
+                    return best_move, best_value
+        
+    return best_move, best_value
     raise NotImplementedError
 
 def alphabeta_max_limit(board, curr_player, alpha, beta, heuristic_func, depth_limit):
@@ -54,7 +117,28 @@ def alphabeta_max_limit(board, curr_player, alpha, beta, heuristic_func, depth_l
     :param depth_limit: the depth limit
     :return the best move and its estimated minimax value.
     """
+    if(is_terminal(board) == True or depth_limit == 0):
+        return None, heuristic_func(board, curr_player)
 
+    depth_limit -= 1
+    best_move = None
+    best_value = float('-inf')
+
+    for index in board.get_possible_moves(curr_player):
+        new_board = play_move(board, curr_player, index)
+        if curr_player == TOP:
+            _, value = alphabeta_min_limit(new_board, BOTTOM, alpha, beta, heuristic_func, depth_limit)
+        if curr_player == BOTTOM:
+            _, value = alphabeta_min_limit(new_board, TOP, alpha, beta, heuristic_func, depth_limit)
+        if value > best_value:
+            best_move = index
+            best_value = value
+            if best_value < beta:
+                beta = best_value
+                if alpha >= beta:
+                    return best_move, best_value
+        
+    return best_move, best_value
     raise NotImplementedError
 
 def alphabeta_min_limit(board, curr_player, alpha, beta, heuristic_func, depth_limit):
@@ -71,7 +155,31 @@ def alphabeta_min_limit(board, curr_player, alpha, beta, heuristic_func, depth_l
     :param depth_limit: the depth limit
     :return the best move and its estimated minimax value.
     """
+    if(is_terminal(board) == True or depth_limit == 0):
+        if curr_player == TOP:
+            return None, heuristic_func(board, BOTTOM)
+        if curr_player == BOTTOM:
+            return None, heuristic_func(board, TOP)
+   
+    depth_limit -= 1
+    best_move = None
+    best_value = float('inf')
 
+    for index in board.get_possible_moves(curr_player):
+        new_board = play_move(board, curr_player, index)
+        if curr_player == TOP:
+            _, value = alphabeta_max_basic(new_board, BOTTOM, alpha, beta, heuristic_func, depth_limit)
+        if curr_player == BOTTOM:
+            _, value = alphabeta_max_basic(new_board, TOP, alpha, beta, heuristic_func, depth_limit)
+        if value < best_value:
+            best_move = index
+            best_value = value
+            if best_value < beta:
+                beta = best_value
+                if alpha >= beta:
+                    return best_move, best_value
+        
+    return best_move, best_value
     raise NotImplementedError
 
 def alphabeta_max_limit_caching(board, curr_player, alpha, beta, heuristic_func, depth_limit, cache):
